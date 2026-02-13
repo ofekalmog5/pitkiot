@@ -29,7 +29,7 @@ jobs:
           build 2>&1 | tee build.log
       continue-on-error: true
     
-    - name: Build for iOS Device
+    - name: Build for iOS Device (Release)
       run: |
         xcodebuild \
           -project HebrewAlias.xcodeproj \
@@ -38,31 +38,56 @@ jobs:
           -sdk iphoneos \
           -derivedDataPath build \
           build 2>&1 | tee -a build.log
-      continue-on-error: true
     
-    - name: Build for iOS Device
+    - name: Verify Device Build
       run: |
-        xcodebuild \
-          -project HebrewAlias.xcodeproj \
-          -scheme HebrewAlias \
-          -configuration Release \
-          -sdk iphoneos \
-          -derivedDataPath build \
-          build 2>&1 | tee -a build.log
-      continue-on-error: true
+        if [ ! -d "build/Build/Products/Release-iphoneos/HebrewAlias.app" ]; then
+          echo "❌ ERROR: Device build failed - app bundle not found!"
+          echo "Build log contents:"
+          cat build.log
+          exit 1
+        fi
+        echo "✅ Device app bundle exists"
+        ls -lh build/Build/Products/Release-iphoneos/HebrewAlias.app
+        ls -lh build/Build/Products/Release-iphoneos/HebrewAlias.app/HebrewAlias
     
     - name: Create IPA for Sideloadly
       run: |
         set -e
+        echo "Creating IPA structure..."
         mkdir -p build/Payload
+        
         # Copy the app to Payload directory
+        echo "Copying app bundle..."
         cp -r build/Build/Products/Release-iphoneos/HebrewAlias.app build/Payload/
-        # Create IPA by zipping Payload folder
-        cd build/Payload
-        zip -r ../HebrewAlias.ipa HebrewAlias.app
-        cd ../
+        
+        # Verify the app was copied
+        if [ ! -f "build/Payload/HebrewAlias.app/HebrewAlias" ]; then
+          echo "❌ ERROR: Executable not found in copied app!"
+          ls -la build/Payload/HebrewAlias.app/ || echo "App directory doesn't exist!"
+          exit 1
+        fi
+        
+        # Create IPA by zipping from the correct location
+        echo "Creating ZIP archive..."
+        cd build
+        rm -f HebrewAlias.ipa
+        zip -r HebrewAlias.ipa Payload/HebrewAlias.app
+        
+        # Verify IPA was created and has content
+        if [ ! -f "HebrewAlias.ipa" ]; then
+          echo "❌ ERROR: IPA file was not created!"
+          exit 1
+        fi
+        
+        ipa_size=$(stat -f%z HebrewAlias.ipa 2>/dev/null || stat -c%s HebrewAlias.ipa 2>/dev/null || echo "unknown")
+        if [ "$ipa_size" = "unknown" ] || [ "$ipa_size" -lt 5000000 ]; then
+          echo "❌ WARNING: IPA file seems too small (size: $ipa_size bytes)"
+          echo "Expected > 5MB for a valid app"
+        fi
+        
         ls -lh HebrewAlias.ipa
-        echo "IPA created successfully"
+        echo "✅ IPA created successfully"
     
     - name: Upload Build Artifacts
       if: always()
