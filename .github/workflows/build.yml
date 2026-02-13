@@ -53,11 +53,16 @@ jobs:
     
     - name: Create IPA for Sideloadly
       run: |
+        set -e
         mkdir -p build/Payload
+        # Copy the app to Payload directory
         cp -r build/Build/Products/Release-iphoneos/HebrewAlias.app build/Payload/
-        cd build
-        zip -r HebrewAlias.ipa Payload/
+        # Create IPA by zipping Payload folder
+        cd build/Payload
+        zip -r ../HebrewAlias.ipa HebrewAlias.app
+        cd ../
         ls -lh HebrewAlias.ipa
+        echo "IPA created successfully"
     
     - name: Upload Build Artifacts
       if: always()
