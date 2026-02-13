@@ -21,7 +21,7 @@ jobs:
     - name: Build for iOS Simulator
       run: |
         xcodebuild \
-          -project HebrewAlias/HebrewAlias.xcodeproj \
+          -project HebrewAlias.xcodeproj \
           -scheme HebrewAlias \
           -configuration Debug \
           -sdk iphonesimulator \
@@ -31,7 +31,7 @@ jobs:
     - name: Build for iOS Device
       run: |
         xcodebuild \
-          -project HebrewAlias/HebrewAlias.xcodeproj \
+          -project HebrewAlias.xcodeproj \
           -scheme HebrewAlias \
           -configuration Release \
           -sdk iphoneos \
@@ -42,7 +42,7 @@ jobs:
       run: |
         mkdir -p build/output
         xcodebuild \
-          -project HebrewAlias/HebrewAlias.xcodeproj \
+          -project HebrewAlias.xcodeproj \
           -scheme HebrewAlias \
           -configuration Release \
           -sdk iphoneos \
