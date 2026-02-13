@@ -17,7 +17,6 @@
 		5710AAA82B7A8C0000ABC123 /* GameplayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 570E1A562B7A8C0000ABC123 /* GameplayView.swift */; };
 		5710AAA92B7A8C0000ABC123 /* RoundResultsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 570E1A572B7A8C0000ABC123 /* RoundResultsView.swift */; };
 		5710AAAA2B7A8C0000ABC123 /* GameResultsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 570E1A582B7A8C0000ABC123 /* GameResultsView.swift */; };
-		5710AAAB2B7A8C0000ABC123 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 570E1A592B7A8C0000ABC123 /* Info.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -193,7 +192,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5710AAAB2B7A8C0000ABC123 /* Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
