@@ -218,22 +218,19 @@ struct GameplayCardView: View {
             } else {
                 VStack(spacing: 15) {
                     Spacer()
-                    Text("סיימת את כל המילים!")
-                        .font(.title2)
-                        .fontWeight(.bold)
-                    
-                    Button(action: {
-                        viewModel.endTurn()
-                    }) {
-                        Text("הבא")
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 12)
-                            .background(Color.blue)
-                            .foregroundColor(.white)
-                            .cornerRadius(10)
+                    HStack(spacing: 12) {
+                        ProgressView()
+                            .tint(.blue)
+                        Text("חכה למילה הבאה...")
+                            .font(.headline)
+                            .opacity(0.7)
                     }
-                    .padding(.horizontal, 20)
                     Spacer()
+                }
+                .onAppear {
+                    if !viewModel.isTimerRunning && viewModel.timeRemaining > 0 {
+                        viewModel.startTurn()
+                    }
                 }
             }
         }

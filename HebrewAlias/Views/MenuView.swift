@@ -6,7 +6,6 @@ struct MenuView: View {
     @State private var showCustomSettings = false
     @State private var customRounds: Int = 3
     @State private var selectedDifficulty: DifficultyLevel = .medium
-    @State private var showIconGenerator = false
     
     var body: some View {
         VStack(spacing: 30) {
@@ -61,19 +60,7 @@ struct MenuView: View {
                 }
                 .padding(.horizontal, 20)
 
-                Button(action: { showIconGenerator = true }) {
-                    Text("יצירת אייקון אפליקציה")
-                        .font(.subheadline)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 10)
-                        .background(Color.white.opacity(0.15))
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
-                }
-                .padding(.horizontal, 20)
-                
-                Spacer()
-                
+
                 // Start Button
                 Button(action: {
                     viewModel.gamePhase = .teamSetup
@@ -100,9 +87,6 @@ struct MenuView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .sheet(isPresented: $showIconGenerator) {
-            AppIconGenerator()
-        }
     }
 }
 

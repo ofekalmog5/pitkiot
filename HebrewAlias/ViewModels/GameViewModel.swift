@@ -144,6 +144,13 @@ class GameViewModel: ObservableObject {
     }
     
     func getNextWord() -> Word? {
+        // If all current words are done, generate a new one
+        if !currentWords.contains(where: { !$0.isGuessed && !$0.isSkipped }) {
+            // Generate a new word during the turn
+            if let newWord = wordDatabase.getRandomWords(count: 1, difficulty: settings.difficulty).first {
+                currentWords.append(newWord)
+            }
+        }
         return currentWords.first { !$0.isGuessed && !$0.isSkipped }
     }
     
