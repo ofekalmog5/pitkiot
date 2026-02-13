@@ -40,7 +40,14 @@ struct TeamSetupView: View {
                 
                 ForEach(0..<viewModel.settings.numberOfTeams, id: \.self) { index in
                     HStack {
-                        TextField("שם קבוצה", text: $teamNames[safe: index] ?? .constant("קבוצה \(index + 1)"))
+                        TextField("שם קבוצה", text: Binding(
+                            get: { teamNames[safe: index] ?? "קבוצה \(index + 1)" },
+                            set: { newValue in
+                                if index < teamNames.count {
+                                    teamNames[index] = newValue
+                                }
+                            }
+                        ))
                             .textFieldStyle(.roundedBorder)
                             .font(.headline)
                         

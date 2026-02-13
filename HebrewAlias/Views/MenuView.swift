@@ -128,7 +128,10 @@ struct CustomSettingsView: View {
                             .font(.headline)
                             .fontWeight(.semibold)
                         
-                        Slider(value: Double($rounds), in: 1...10, step: 1)
+                        Slider(value: Binding(
+                            get: { Double(rounds) },
+                            set: { rounds = Int($0) }
+                        ), in: 1...10, step: 1)
                             .tint(.blue)
                         
                         HStack {

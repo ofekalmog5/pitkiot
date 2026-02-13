@@ -132,7 +132,7 @@ struct TurnResult {
     let guessedCount: Int
     let skippedCount: Int
     let totalTime: Int
-    let wordsPerMinute: Double {
+    var wordsPerMinute: Double {
         let timeInMinutes = Double(totalTime) / 60.0
         return timeInMinutes > 0 ? Double(guessedCount) / timeInMinutes : 0
     }
