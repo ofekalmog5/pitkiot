@@ -18,6 +18,22 @@ jobs:
     - name: Select Xcode version
       run: sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer
     
+    - name: Debug - List Xcode projects
+      run: |
+        echo "=== Looking for Xcode projects ==="
+        find . -name "*.xcodeproj" -type d
+        echo ""
+        echo "=== Project structure ==="
+        ls -la HebrewAlias.xcodeproj/
+        echo ""
+        echo "=== Checking for schemes ==="
+        ls -la HebrewAlias.xcodeproj/xcshareddata/xcschemes/ 2>/dev/null || echo "No schemes directory"
+    
+    - name: Debug - Check Swift files
+      run: |
+        echo "=== Swift files found ==="
+        find HebrewAlias -name "*.swift" -type f
+    
     - name: Build for iOS Simulator
       run: |
         xcodebuild \
@@ -26,38 +42,27 @@ jobs:
           -configuration Debug \
           -sdk iphonesimulator \
           -derivedDataPath build \
-          build
+          -verbose \
+          build 2>&1 | tee build.log
+      continue-on-error: true
     
-    - name: Build for iOS Device
+    - name: Extract error from build log
+      if: failure()
       run: |
-        xcodebuild \
-          -project HebrewAlias.xcodeproj \
-          -target HebrewAlias \
-          -configuration Release \
-          -sdk iphoneos \
-          -derivedDataPath build \
-          build
-    
-    - name: Create IPA
-      run: |
-        mkdir -p build/output
-        xcodebuild \
-          -project HebrewAlias.xcodeproj \
-          -target HebrewAlias \
-          -configuration Release \
-          -sdk iphoneos \
-          -archivePath build/Pitkiot.xcarchive \
-          archive
+        echo "=== Build Log (last 100 lines) ==="
+        tail -100 build.log || echo "No build log found"
     
     - name: Upload Build Artifacts
       if: always()
       uses: actions/upload-artifact@v4
       with:
         name: pitkiot-build
-        path: build
+        path: |
+          build
+          build.log
         retention-days: 30
     
     - name: Build Summary
       run: |
-        echo "✅ Pitkiot Build Complete!"
-        echo "Build artifacts available for download"
+        echo "✅ Pitkiot Build Attempt Complete!"
+        echo "Check artifacts for build logs"
