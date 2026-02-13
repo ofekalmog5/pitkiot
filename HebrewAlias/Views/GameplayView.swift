@@ -114,6 +114,14 @@ struct GameplayView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .alert("לצאת מהמשחק?", isPresented: $showExitAlert) {
+            Button("ביטול", role: .cancel) { }
+            Button("יציאה", role: .destructive) {
+                viewModel.restart()
+            }
+        } message: {
+            Text("התקדמות המשחק לא תישמר")
+        }
     }
 }
 
@@ -228,14 +236,6 @@ struct GameplayCardView: View {
                     Spacer()
                 }
             }
-        }
-        .alert("לצאת מהמשחק?", isPresented: $showExitAlert) {
-            Button("ביטול", role: .cancel) { }
-            Button("יציאה", role: .destructive) {
-                viewModel.restart()
-            }
-        } message: {
-            Text("התקדמות המשחק לא תישמר")
         }
     }
 }
