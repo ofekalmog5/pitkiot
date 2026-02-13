@@ -38,9 +38,30 @@ jobs:
           -configuration Release \
           -sdk iphoneos \
           -derivedDataPath build \
-          -verbose \
           archive -archivePath build/HebrewAlias.xcarchive 2>&1 | tee -a build.log
-        echo "Device archive completed with exit code: $?"
+        
+        ARCH_EXIT=$?
+        echo "Archive command exit code: $ARCH_EXIT"
+        
+        # Check if archive actually has content
+        if [ ! -d "build/HebrewAlias.xcarchive" ]; then
+          echo "❌ ERROR: Archive directory not created!"
+          echo "=== Last 100 lines of build.log ==="
+          tail -100 build.log
+          exit 1
+        fi
+        
+        if [ ! -d "build/HebrewAlias.xcarchive/Products/Applications/HebrewAlias.app" ]; then
+          echo "❌ ERROR: App not found in archive!"
+          echo "Archive structure:"
+          find build/HebrewAlias.xcarchive -type d
+          echo ""
+          echo "=== Last 100 lines of build.log ==="
+          tail -100 build.log
+          exit 1
+        fi
+        
+        exit $ARCH_EXIT
     
     - name: Verify Device Build
       run: |
@@ -60,22 +81,25 @@ jobs:
         fi
         echo "✅ xcarchive found!"
         
-        # Extract the app from the archive
-        echo "Extracting app from xcarchive..."
-        if [ ! -d "build/HebrewAlias.xcarchive/Products/Applications/HebrewAlias.app" ]; then
-          echo "❌ ERROR: App not found in xcarchive!"
-          ls -la build/HebrewAlias.xcarchive/Products/Applications/
-          exit 1
-        fi
+        # Show full xcarchive structure
+        echo ""
+        echo "=== xcarchive Structure ==="
+        find build/HebrewAlias.xcarchive -type f | head -30
         
-        echo "✅ App found in xcarchive"
-        echo "=== Archive Contents ==="
-        ls -lh build/HebrewAlias.xcarchive/Products/Applications/HebrewAlias.app
-        du -sh build/HebrewAlias.xcarchive/Products/Applications/HebrewAlias.app/
+        # Look for the app bundle
+        echo ""
+        echo "=== Looking for app bundle ==="
+        if [ -d "build/HebrewAlias.xcarchive/Products/Applications/HebrewAlias.app" ]; then
+          echo "✅ App found in Products/Applications"
+          ls -lh build/HebrewAlias.xcarchive/Products/Applications/HebrewAlias.app/
+        else
+          echo "❌ App not found in Products/Applications"
+          echo "Searching for .app bundles in xcarchive..."
+          find build/HebrewAlias.xcarchive -type d -name "*.app"
+        fi
     
     - name: Create IPA for Sideloadly
       run: |
-        set -e
         echo "Creating IPA structure from xcarchive..."
         mkdir -p build/Payload
         
@@ -84,13 +108,23 @@ jobs:
         cp -r build/HebrewAlias.xcarchive/Products/Applications/HebrewAlias.app build/Payload/
         
         # Verify the app was copied
+        echo "=== Checking app contents ==="
+        ls -la build/Payload/HebrewAlias.app/
+        
         if [ ! -f "build/Payload/HebrewAlias.app/HebrewAlias" ]; then
-          echo "❌ ERROR: Executable not found in extracted app!"
-          ls -la build/Payload/HebrewAlias.app/ || echo "App directory doesn't exist!"
+          echo ""
+          echo "❌ ERROR: Executable not found in app bundle!"
+          echo "This indicates the archive was created but the binary wasn't included"
+          echo ""
+          echo "=== FULL BUILD LOG ==="
+          cat build.log
+          echo ""
+          echo "=== Archive structure ==="
+          find build/HebrewAlias.xcarchive -type f | head -50
           exit 1
         fi
         
-        echo "✅ App extracted successfully"
+        echo "✅ App extracted successfully with executable"
         
         # Create IPA by zipping from the correct location
         echo "Creating ZIP archive..."
@@ -105,9 +139,9 @@ jobs:
         fi
         
         ipa_size=$(stat -f%z HebrewAlias.ipa 2>/dev/null || stat -c%s HebrewAlias.ipa 2>/dev/null || echo "unknown")
+        echo "IPA file size: $ipa_size bytes"
         if [ "$ipa_size" = "unknown" ] || [ "$ipa_size" -lt 5000000 ]; then
-          echo "❌ WARNING: IPA file seems too small (size: $ipa_size bytes)"
-          echo "Expected > 5MB for a valid app"
+          echo "❌ WARNING: IPA file seems too small"
         fi
         
         ls -lh HebrewAlias.ipa
@@ -120,7 +154,6 @@ jobs:
         name: pitkiot-build
         path: |
           build/HebrewAlias.ipa
-          build/Build/Products/Debug-iphonesimulator/HebrewAlias.app
           build.log
         retention-days: 30
     
