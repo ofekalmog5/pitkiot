@@ -31,42 +31,66 @@ jobs:
     
     - name: Build for iOS Device (Release)
       run: |
+        echo "Starting device archive build for Release configuration..."
         xcodebuild \
           -project HebrewAlias.xcodeproj \
           -scheme HebrewAlias \
           -configuration Release \
           -sdk iphoneos \
           -derivedDataPath build \
-          build 2>&1 | tee -a build.log
+          -verbose \
+          archive -archivePath build/HebrewAlias.xcarchive 2>&1 | tee -a build.log
+        echo "Device archive completed with exit code: $?"
     
     - name: Verify Device Build
       run: |
-        if [ ! -d "build/Build/Products/Release-iphoneos/HebrewAlias.app" ]; then
-          echo "❌ ERROR: Device build failed - app bundle not found!"
-          echo "Build log contents:"
-          cat build.log
+        echo "Checking for Release xcarchive..."
+        if [ ! -d "build/HebrewAlias.xcarchive" ]; then
+          echo "❌ ERROR: xcarchive not found!"
+          echo ""
+          echo "=== Searching for any .xcarchive in build directory ==="
+          find build -type d -name "*.xcarchive" 2>/dev/null || echo "No .xcarchive found"
+          echo ""
+          echo "=== Build directory structure (first 50 lines) ==="
+          find build -type f 2>/dev/null | head -50 || echo "Build directory empty or error listing"
+          echo ""
+          echo "=== Last 150 lines of build.log ==="
+          tail -150 build.log 2>/dev/null || echo "No build.log found"
           exit 1
         fi
-        echo "✅ Device app bundle exists"
-        ls -lh build/Build/Products/Release-iphoneos/HebrewAlias.app
-        ls -lh build/Build/Products/Release-iphoneos/HebrewAlias.app/HebrewAlias
+        echo "✅ xcarchive found!"
+        
+        # Extract the app from the archive
+        echo "Extracting app from xcarchive..."
+        if [ ! -d "build/HebrewAlias.xcarchive/Products/Applications/HebrewAlias.app" ]; then
+          echo "❌ ERROR: App not found in xcarchive!"
+          ls -la build/HebrewAlias.xcarchive/Products/Applications/
+          exit 1
+        fi
+        
+        echo "✅ App found in xcarchive"
+        echo "=== Archive Contents ==="
+        ls -lh build/HebrewAlias.xcarchive/Products/Applications/HebrewAlias.app
+        du -sh build/HebrewAlias.xcarchive/Products/Applications/HebrewAlias.app/
     
     - name: Create IPA for Sideloadly
       run: |
         set -e
-        echo "Creating IPA structure..."
+        echo "Creating IPA structure from xcarchive..."
         mkdir -p build/Payload
         
-        # Copy the app to Payload directory
-        echo "Copying app bundle..."
-        cp -r build/Build/Products/Release-iphoneos/HebrewAlias.app build/Payload/
+        # Extract app from xcarchive
+        echo "Extracting app bundle from xcarchive..."
+        cp -r build/HebrewAlias.xcarchive/Products/Applications/HebrewAlias.app build/Payload/
         
         # Verify the app was copied
         if [ ! -f "build/Payload/HebrewAlias.app/HebrewAlias" ]; then
-          echo "❌ ERROR: Executable not found in copied app!"
+          echo "❌ ERROR: Executable not found in extracted app!"
           ls -la build/Payload/HebrewAlias.app/ || echo "App directory doesn't exist!"
           exit 1
         fi
+        
+        echo "✅ App extracted successfully"
         
         # Create IPA by zipping from the correct location
         echo "Creating ZIP archive..."
