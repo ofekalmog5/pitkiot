@@ -5,6 +5,7 @@ on:
     branches: [ main, develop ]
   pull_request:
     branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -12,38 +13,51 @@ jobs:
     
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     
     - name: Select Xcode version
       run: sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer
     
-    - name: Build iOS App
+    - name: Build for iOS Simulator
       run: |
-        cd HebrewAlias
         xcodebuild \
+          -project HebrewAlias/HebrewAlias.xcodeproj \
           -scheme HebrewAlias \
           -configuration Debug \
-          -destination 'platform=iOS Simulator,name=iPhone 15' \
+          -sdk iphonesimulator \
           -derivedDataPath build \
           build
     
-    - name: Generate Simulator Build
+    - name: Build for iOS Device
       run: |
-        cd HebrewAlias
         xcodebuild \
+          -project HebrewAlias/HebrewAlias.xcodeproj \
           -scheme HebrewAlias \
           -configuration Release \
+          -sdk iphoneos \
           -derivedDataPath build \
-          -sdk iphonesimulator \
           build
+    
+    - name: Create IPA
+      run: |
+        mkdir -p build/output
+        xcodebuild \
+          -project HebrewAlias/HebrewAlias.xcodeproj \
+          -scheme HebrewAlias \
+          -configuration Release \
+          -sdk iphoneos \
+          -archivePath build/Pitkiot.xcarchive \
+          archive
     
     - name: Upload Build Artifacts
       if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: build-artifacts
-        path: HebrewAlias/build
+        name: pitkiot-build
+        path: build
         retention-days: 30
     
-    - name: Check Build Status
-      run: echo "✅ Build completed successfully!"
+    - name: Build Summary
+      run: |
+        echo "✅ Pitkiot Build Complete!"
+        echo "Build artifacts available for download"
