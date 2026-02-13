@@ -37,16 +37,22 @@ class GameViewModel: ObservableObject {
     
     // MARK: - Round Management
     private func prepareRound() {
-        currentWords = wordDatabase.getRandomWords(count: settings.wordsPerRound, difficulty: settings.difficulty)
+        let wordCount = settings.unlimitedTimeMode ? settings.wordsPerTurnInUnlimitedMode : settings.wordsPerRound
+        currentWords = wordDatabase.getRandomWords(count: wordCount, difficulty: settings.difficulty)
         guessedThisRound = 0
         skippedThisRound = 0
         timeRemaining = settings.timePerTurn
     }
     
     func startTurn() {
-        isTimerRunning = true
-        timeRemaining = settings.timePerTurn
-        startTimer()
+        if !settings.unlimitedTimeMode {
+            isTimerRunning = true
+            timeRemaining = settings.timePerTurn
+            startTimer()
+        } else {
+            isTimerRunning = false
+            timeRemaining = 0
+        }
     }
     
     private func startTimer() {
@@ -94,6 +100,8 @@ class GameViewModel: ObservableObject {
         currentTeamIndex += 1
         
         if currentTeamIndex < settings.numberOfTeams {
+            // Prepare new words for the next team
+            prepareRound()
             gamePhase = .roundResults
         } else {
             // Round complete

@@ -96,6 +96,7 @@ struct CustomSettingsView: View {
     @Binding var difficulty: DifficultyLevel
     @Binding var settings: GameSettings
     @Binding var showCustomSettings: Bool
+    @State private var unlimitedTimeMode: Bool = false
     
     var body: some View {
         VStack(spacing: 20) {
@@ -176,6 +177,25 @@ struct CustomSettingsView: View {
                         }
                     }
                     .padding(.horizontal, 20)
+                    
+                    Divider()
+                        .padding(.horizontal, 20)
+                    
+                    // Unlimited Time Mode Toggle
+                    VStack(alignment: .leading, spacing: 10) {
+                        Toggle(isOn: $unlimitedTimeMode) {
+                            VStack(alignment: .leading, spacing: 3) {
+                                Text("משחק ללא הגבלת זמן")
+                                    .font(.headline)
+                                    .fontWeight(.semibold)
+                                Text(unlimitedTimeMode ? "5 מילים בכל תור" : "משחק עם טיימר")
+                                    .font(.caption)
+                                    .opacity(0.7)
+                            }
+                        }
+                        .tint(.blue)
+                    }
+                    .padding(.horizontal, 20)
                 }
                 .padding(.vertical, 20)
             }
@@ -186,6 +206,7 @@ struct CustomSettingsView: View {
             Button(action: {
                 settings.numberOfRounds = rounds
                 settings.difficulty = difficulty
+                settings.unlimitedTimeMode = unlimitedTimeMode
                 showCustomSettings = false
             }) {
                 Text("החל הגדרות")
@@ -199,6 +220,9 @@ struct CustomSettingsView: View {
             }
             .padding(.horizontal, 20)
             .padding(.bottom, 20)
+        }
+        .onAppear {
+            unlimitedTimeMode = settings.unlimitedTimeMode
         }
     }
 }

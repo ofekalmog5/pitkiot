@@ -3,11 +3,23 @@ import SwiftUI
 struct GameplayView: View {
     @EnvironmentObject var viewModel: GameViewModel
     @State private var hasStarted = false
+    @State private var showExitAlert = false
     
     var body: some View {
         VStack(spacing: 0) {
             // Header
             HStack {
+                // Exit button
+                Button(action: {
+                    showExitAlert = true
+                }) {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.title2)
+                        .foregroundColor(.red.opacity(0.7))
+                }
+                
+                Spacer()
+                
                 VStack(alignment: .leading, spacing: 5) {
                     Text("סיבוב \(viewModel.currentRound) מתוך \(viewModel.settings.numberOfRounds)")
                         .font(.caption)
@@ -28,15 +40,21 @@ struct GameplayView: View {
                 Spacer()
                 
                 VStack(alignment: .trailing, spacing: 5) {
-                    Text("זמן:")
+                    Text(viewModel.settings.unlimitedTimeMode ? "" : "זמן:")
                         .font(.caption)
-                    HStack(spacing: 0) {
-                        Text("\(viewModel.timeRemaining)")
-                            .font(.title)
-                            .fontWeight(.bold)
-                            .foregroundColor(viewModel.timeRemaining < 10 ? .red : .primary)
-                        Text("ש")
-                            .font(.caption)
+                    if viewModel.settings.unlimitedTimeMode {
+                        Text("אין הגבלת זמן")
+                            .font(.headline)
+                            .foregroundColor(.green)
+                    } else {
+                        HStack(spacing: 0) {
+                            Text("\(viewModel.timeRemaining)")
+                                .font(.title)
+                                .fontWeight(.bold)
+                                .foregroundColor(viewModel.timeRemaining < 10 ? .red : .primary)
+                            Text("ש")
+                                .font(.caption)
+                        }
                     }
                 }
             }
@@ -60,9 +78,15 @@ struct GameplayView: View {
                             .multilineTextAlignment(.center)
                             .opacity(0.8)
                         
-                        Text("יש לך \(viewModel.settings.timePerTurn) שניות")
-                            .font(.headline)
-                            .foregroundColor(.blue)
+                        if viewModel.settings.unlimitedTimeMode {
+                            Text("תארו \(viewModel.settings.wordsPerTurnInUnlimitedMode) מילים - ללא הגבלת זמן!")
+                                .font(.headline)
+                                .foregroundColor(.green)
+                        } else {
+                            Text("יש לך \(viewModel.settings.timePerTurn) שניות")
+                                .font(.headline)
+                                .foregroundColor(.blue)
+                        }
                     }
                     .padding(.horizontal, 30)
                     
@@ -204,6 +228,14 @@ struct GameplayCardView: View {
                     Spacer()
                 }
             }
+        }
+        .alert("לצאת מהמשחק?", isPresented: $showExitAlert) {
+            Button("ביטול", role: .cancel) { }
+            Button("יציאה", role: .destructive) {
+                viewModel.restart()
+            }
+        } message: {
+            Text("התקדמות המשחק לא תישמר")
         }
     }
 }

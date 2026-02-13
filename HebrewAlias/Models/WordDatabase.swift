@@ -182,8 +182,13 @@ class WordDatabase {
     }
     
     func getRandomWords(count: Int, difficulty: DifficultyLevel = .medium) -> [Word] {
-        let filtered = allWords.filter { $0.difficulty == difficulty }
-        return Array(filtered.shuffled().prefix(count))
+        if difficulty == .mixed {
+            // Mix words from all difficulties
+            return Array(allWords.shuffled().prefix(count))
+        } else {
+            let filtered = allWords.filter { $0.difficulty == difficulty }
+            return Array(filtered.shuffled().prefix(count))
+        }
     }
     
     func getWordsByCategory(_ category: String, count: Int, difficulty: DifficultyLevel = .medium) -> [Word] {

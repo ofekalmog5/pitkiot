@@ -5,6 +5,7 @@ enum DifficultyLevel: String, CaseIterable {
     case easy = "קל"
     case medium = "בינוני"
     case hard = "קשה"
+    case mixed = "מעורב"
     
     var description: String {
         switch self {
@@ -14,6 +15,8 @@ enum DifficultyLevel: String, CaseIterable {
             return "מילים בינוניות"
         case .hard:
             return "מילים מורכבות וקשות"
+        case .mixed:
+            return "מילים מכל הרמות"
         }
     }
 }
@@ -25,6 +28,8 @@ struct GameSettings {
     var numberOfTeams: Int = 2
     var wordsPerRound: Int = 10
     var difficulty: DifficultyLevel = .medium
+    var unlimitedTimeMode: Bool = false
+    var wordsPerTurnInUnlimitedMode: Int = 5
     
     static let presets = [
         GameSettings(numberOfRounds: 1, timePerTurn: 60, numberOfTeams: 2, wordsPerRound: 5, difficulty: .easy),
