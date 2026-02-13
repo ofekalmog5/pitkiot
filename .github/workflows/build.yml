@@ -22,7 +22,7 @@ jobs:
       run: |
         xcodebuild \
           -project HebrewAlias.xcodeproj \
-          -scheme HebrewAlias \
+          -target HebrewAlias \
           -configuration Debug \
           -sdk iphonesimulator \
           -derivedDataPath build \
@@ -32,7 +32,7 @@ jobs:
       run: |
         xcodebuild \
           -project HebrewAlias.xcodeproj \
-          -scheme HebrewAlias \
+          -target HebrewAlias \
           -configuration Release \
           -sdk iphoneos \
           -derivedDataPath build \
@@ -43,7 +43,7 @@ jobs:
         mkdir -p build/output
         xcodebuild \
           -project HebrewAlias.xcodeproj \
-          -scheme HebrewAlias \
+          -target HebrewAlias \
           -configuration Release \
           -sdk iphoneos \
           -archivePath build/Pitkiot.xcarchive \
