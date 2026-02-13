@@ -75,6 +75,8 @@ class GameViewModel: ObservableObject {
             currentWords[index].isGuessed = true
             guessedThisRound += 1
             teams[currentTeamIndex].score += 1
+            // Generate new word if needed
+            ensureWordsAvailable()
         }
     }
     
@@ -82,6 +84,17 @@ class GameViewModel: ObservableObject {
         if let index = currentWords.firstIndex(where: { $0.id == word.id }) {
             currentWords[index].isSkipped = true
             skippedThisRound += 1
+            // Generate new word if needed
+            ensureWordsAvailable()
+        }
+    }
+    
+    private func ensureWordsAvailable() {
+        // If no unplayed words, generate a new one
+        if !currentWords.contains(where: { !$0.isGuessed && !$0.isSkipped }) {
+            if let newWord = wordDatabase.getRandomWords(count: 1, difficulty: settings.difficulty).first {
+                currentWords.append(newWord)
+            }
         }
     }
     
@@ -144,13 +157,8 @@ class GameViewModel: ObservableObject {
     }
     
     func getNextWord() -> Word? {
-        // If all current words are done, generate a new one
-        if !currentWords.contains(where: { !$0.isGuessed && !$0.isSkipped }) {
-            // Generate a new word during the turn
-            if let newWord = wordDatabase.getRandomWords(count: 1, difficulty: settings.difficulty).first {
-                currentWords.append(newWord)
-            }
-        }
+        // Always ensure words are available
+        ensureWordsAvailable()
         return currentWords.first { !$0.isGuessed && !$0.isSkipped }
     }
     
