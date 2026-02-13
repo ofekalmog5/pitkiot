@@ -66,7 +66,11 @@ struct TeamSetupView: View {
             Button(action: {
                 let names = teamNames.prefix(viewModel.settings.numberOfTeams).map { $0.isEmpty ? "קבוצה" : $0 }
                 viewModel.createTeams(with: Array(names))
-                viewModel.startGame()
+                
+                // Ensure state updateby dispatching to main thread
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    viewModel.startGame()
+                }
             }) {
                 Text("התחל משחק!")
                     .font(.title2)

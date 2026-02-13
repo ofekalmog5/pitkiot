@@ -10,19 +10,29 @@ struct ContentView: View {
                 Color(red: 0.95, green: 0.88, blue: 0.75)
                     .ignoresSafeArea()
                 
-                // Grid pattern overlay
-                VStack(spacing: 40) {
-                    ForEach(0..<20, id: \.self) { _ in
-                        HStack(spacing: 40) {
-                            ForEach(0..<10, id: \.self) { _ in
-                                RoundedRectangle(cornerRadius: 8)
-                                    .stroke(Color.white.opacity(0.3), lineWidth: 1)
-                                    .frame(height: 30)
-                            }
-                        }
+                // Simpler grid pattern overlay using Canvas
+                Canvas { context in
+                    let gridSize: CGFloat = 50
+                    let width = UIScreen.main.bounds.width
+                    let height = UIScreen.main.bounds.height
+                    
+                    // Vertical lines
+                    for x in stride(from: 0, through: width, by: gridSize) {
+                        var path = Path()
+                        path.move(to: CGPoint(x: x, y: 0))
+                        path.addLine(to: CGPoint(x: x, y: height))
+                        context.stroke(path, with: .color(Color.white.opacity(0.2)), lineWidth: 0.5)
+                    }
+                    
+                    // Horizontal lines
+                    for y in stride(from: 0, through: height, by: gridSize) {
+                        var path = Path()
+                        path.move(to: CGPoint(x: 0, y: y))
+                        path.addLine(to: CGPoint(x: width, y: y))
+                        context.stroke(path, with: .color(Color.white.opacity(0.2)), lineWidth: 0.5)
                     }
                 }
-                .padding(20)
+                .ignoresSafeArea()
                 
                 // Texture overlay
                 LinearGradient(
