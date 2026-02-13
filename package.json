@@ -1,0 +1,33 @@
+{
+  "name": "Pitkiot",
+  "version": "1.0.0",
+  "description": "Hebrew word description party game for iOS",
+  "platforms": {
+    "iOS": "16.0"
+  },
+  "author": "HebrewAlias Developer",
+  "license": "Proprietary",
+  "keywords": [
+    "game",
+    "party",
+    "hebrew",
+    "word",
+    "alias",
+    "guessing",
+    "multiplayer"
+  ],
+  "appStoreInfo": {
+    "appName": "פיתקיות - משחק תיאור מילים",
+    "bundleIdentifier": "com.pitkiot.app",
+    "minimumOSVersion": "16.0",
+    "supportedDevices": [
+      "iPhone",
+      "iPad"
+    ],
+    "orientations": [
+      "portrait",
+      "landscapeLeft",
+      "landscapeRight"
+    ]
+  }
+}

@@ -1,0 +1,78 @@
+name: Build and Deploy to TestFlight
+
+# This workflow builds the app and uploads to TestFlight for testing on real devices
+# Requires Apple Developer secrets to be configured
+
+on:
+  push:
+    tags:
+      - 'v*'  # Only run on version tags like v1.0.0
+  workflow_dispatch:  # Manual trigger
+
+jobs:
+  build-and-deploy:
+    runs-on: macos-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Setup Xcode
+      run: sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer
+    
+    - name: Import Code Signing Certificate
+      run: |
+        # Decode certificate
+        echo "${{ secrets.BUILD_CERTIFICATE_BASE64 }}" | base64 -D > certificate.p12
+        
+        # Create keychain
+        security create-keychain -p "${{ secrets.KEYCHAIN_PASSWORD }}" build.keychain
+        security default-keychain -s build.keychain
+        security unlock-keychain -p "${{ secrets.KEYCHAIN_PASSWORD }}" build.keychain
+        
+        # Import certificate
+        security import certificate.p12 -k build.keychain -P "${{ secrets.CERTIFICATE_PASSWORD }}" -T /usr/bin/codesign
+        security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "${{ secrets.KEYCHAIN_PASSWORD }}" build.keychain
+    
+    - name: Build for Device
+      run: |
+        cd HebrewAlias
+        xcodebuild \
+          -scheme HebrewAlias \
+          -configuration Release \
+          -derivedDataPath build \
+          -sdk iphoneos \
+          -archivePath build/Pitkiot.xcarchive \
+          archive
+    
+    - name: Export IPA
+      run: |
+        cd HebrewAlias
+        xcodebuild \
+          -exportArchive \
+          -archivePath build/Pitkiot.xcarchive \
+          -exportPath build/export \
+          -exportOptionsPlist ExportOptions.plist
+    
+    - name: Upload to TestFlight
+      run: |
+        cd HebrewAlias/build/export
+        xcrun altool \
+          --upload-app \
+          --file Pitkiot.ipa \
+          --type ios \
+          --apiKey "${{ secrets.APP_STORE_API_KEY }}" \
+          --apiIssuer "${{ secrets.APP_STORE_API_ISSUER }}" \
+          --username "${{ secrets.APPLE_ID }}" \
+          --password "${{ secrets.APPLE_ID_PASSWORD }}"
+    
+    - name: Upload IPA as Artifact
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: pitkiot-ipa
+        path: HebrewAlias/build/export/Pitkiot.ipa
+        retention-days: 30
+    
+    - name: Notify Success
+      run: echo "✅ TestFlight upload successful! Check App Store Connect for review."

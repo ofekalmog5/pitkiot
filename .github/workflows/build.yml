@@ -1,0 +1,49 @@
+name: Build Pitkiot iOS App
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: macos-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Select Xcode version
+      run: sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer
+    
+    - name: Build iOS App
+      run: |
+        cd HebrewAlias
+        xcodebuild \
+          -scheme HebrewAlias \
+          -configuration Debug \
+          -destination 'platform=iOS Simulator,name=iPhone 15' \
+          -derivedDataPath build \
+          build
+    
+    - name: Generate Simulator Build
+      run: |
+        cd HebrewAlias
+        xcodebuild \
+          -scheme HebrewAlias \
+          -configuration Release \
+          -derivedDataPath build \
+          -sdk iphonesimulator \
+          build
+    
+    - name: Upload Build Artifacts
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: build-artifacts
+        path: HebrewAlias/build
+        retention-days: 30
+    
+    - name: Check Build Status
+      run: echo "✅ Build completed successfully!"
