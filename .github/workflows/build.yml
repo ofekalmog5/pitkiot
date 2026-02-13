@@ -32,6 +32,61 @@ jobs:
     - name: Build for iOS Device (Release)
       run: |
         echo "Starting device archive build for Release configuration..."
+        
+        # Clean before building
+        echo "Cleaning old build artifacts..."
+        rm -rf build/
+        
+        # Build first (not archive) to ensure Swift compilation
+        echo "Building for device..."
+        xcodebuild \
+          -project HebrewAlias.xcodeproj \
+          -scheme HebrewAlias \
+          -configuration Release \
+          -sdk iphoneos \
+          -derivedDataPath build \
+          build 2>&1 | tee -a build.log
+        
+        BUILD_EXIT=$?
+        echo "Build command exit code: $BUILD_EXIT"
+        
+        if [ $BUILD_EXIT -ne 0 ]; then
+          echo "❌ Build failed!"
+          tail -100 build.log
+          exit 1
+        fi
+        
+        # Verify executable was created before archiving
+        echo ""
+        echo "=== Checking for compiled executable ==="
+        BUILT_APP="build/Build/Products/Release-iphoneos/HebrewAlias.app"
+        
+        if [ ! -d "$BUILT_APP" ]; then
+          echo "❌ ERROR: No app bundle found at: $BUILT_APP"
+          echo ""
+          echo "=== Searching for .app bundles in build directory ==="
+          find build -type d -name "*.app" 2>/dev/null | head -10 || echo "No .app found"
+          tail -100 build.log
+          exit 1
+        fi
+        
+        # Check if executable exists
+        if [ ! -f "$BUILT_APP/HebrewAlias" ]; then
+          echo "❌ ERROR: Executable not found in: $BUILT_APP"
+          echo ""
+          echo "=== Contents of app bundle ==="
+          ls -la "$BUILT_APP/"
+          echo ""
+          echo "=== Build log errors ==="
+          grep -i "error\|failed" build.log | head -20 || echo "No error patterns found"
+          exit 1
+        fi
+        
+        echo "✅ Executable found at: $BUILT_APP/HebrewAlias"
+        echo "✅ Executable size: $(ls -lh $BUILT_APP/HebrewAlias | awk '{print $5}')"
+        
+        # Now archive
+        echo "Archiving..."
         xcodebuild \
           -project HebrewAlias.xcodeproj \
           -scheme HebrewAlias \
