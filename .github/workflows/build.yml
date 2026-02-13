@@ -50,6 +50,33 @@ jobs:
           -sdk iphoneos \
           -archivePath build/Pitkiot.xcarchive \
           archive 2>&1 | tee -a build.log
+        
+        # Export IPA for Sideloadly
+        xcodebuild \
+          -exportArchive \
+          -archivePath build/Pitkiot.xcarchive \
+          -exportOptionsPlist build/exportOptions.plist \
+          -exportPath build/output 2>&1 | tee -a build.log
+    
+    - name: Create Export Options
+      if: always()
+      run: |
+        cat > build/exportOptions.plist << 'EOF'
+        <?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+        <plist version="1.0">
+        <dict>
+            <key>method</key>
+            <string>ad-hoc</string>
+            <key>signingStyle</key>
+            <string>automatic</string>
+            <key>stripSwiftSymbols</key>
+            <true/>
+            <key>teamID</key>
+            <string></string>
+        </dict>
+        </plist>
+        EOF
     
     - name: Upload Build Artifacts
       if: always()
@@ -57,7 +84,8 @@ jobs:
       with:
         name: pitkiot-build
         path: |
-          build
+          build/output/*.ipa
+          build/Pitkiot.xcarchive
           build.log
         retention-days: 30
     
