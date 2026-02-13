@@ -51,14 +51,22 @@ jobs:
           build 2>&1 | tee -a build.log
       continue-on-error: true
     
+    - name: Create IPA for Sideloadly
+      run: |
+        mkdir -p build/Payload
+        cp -r build/Build/Products/Release-iphoneos/HebrewAlias.app build/Payload/
+        cd build
+        zip -r HebrewAlias.ipa Payload/
+        ls -lh HebrewAlias.ipa
+    
     - name: Upload Build Artifacts
       if: always()
       uses: actions/upload-artifact@v4
       with:
         name: pitkiot-build
         path: |
+          build/HebrewAlias.ipa
           build/Build/Products/Debug-iphonesimulator/HebrewAlias.app
-          build/Build/Products/Release-iphoneos/HebrewAlias.app
           build.log
         retention-days: 30
     
