@@ -4,6 +4,7 @@ struct GameplayView: View {
     @EnvironmentObject var viewModel: GameViewModel
     @State private var hasStarted = false
     @State private var showExitAlert = false
+    @State private var showRestartConfirm = false
     
     var body: some View {
         VStack(spacing: 0) {
@@ -114,13 +115,25 @@ struct GameplayView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .alert("לצאת מהמשחק?", isPresented: $showExitAlert) {
+        .alert("בחר פעולה", isPresented: $showExitAlert) {
             Button("ביטול", role: .cancel) { }
-            Button("יציאה", role: .destructive) {
+            Button("סיים תור", role: .none) {
+                viewModel.endTurn()
+            }
+            Button("יציאה למשחק", role: .destructive) {
                 viewModel.restart()
             }
         } message: {
-            Text("התקדמות המשחק לא תישמר")
+            Text("בחר אפשרות:")
+        }
+        .alert("יש אתה בטוח?", isPresented: $showRestartConfirm) {
+            Button("ביטול", role: .cancel) { }
+            Button("אתחל תור", role: .destructive) {
+                hasStarted = false
+                viewModel.restartTurn()
+            }
+        } message: {
+            Text("זה יחזור את כל המילים בתור")
         }
     }
 }
@@ -211,6 +224,20 @@ struct GameplayCardView: View {
                                 .foregroundColor(.white)
                                 .cornerRadius(10)
                         }
+                    }
+                    .padding(.horizontal, 20)
+                    
+                    // Restart Turn Button
+                    Button(action: {
+                        showRestartConfirm = true
+                    }) {
+                        Text("אתחל תור")
+                            .font(.subheadline)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 10)
+                            .background(Color.orange.opacity(0.6))
+                            .foregroundColor(.white)
+                            .cornerRadius(8)
                     }
                     .padding(.horizontal, 20)
                     .padding(.bottom, 30)

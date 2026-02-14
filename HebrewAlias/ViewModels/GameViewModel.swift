@@ -154,6 +154,19 @@ class GameViewModel: ObservableObject {
         return currentWords.first { !$0.isGuessed && !$0.isSkipped }
     }
     
+    func restartTurn() {
+        // Reset the current turn for the same team
+        isTimerRunning = false
+        timer?.invalidate()
+        guessedThisRound = 0
+        skippedThisRound = 0
+        timeRemaining = settings.timePerTurn
+        
+        // Reload words for this turn
+        let wordCount = settings.unlimitedTimeMode ? settings.wordsPerTurnInUnlimitedMode : settings.wordsPerRound
+        currentWords = wordDatabase.getRandomWords(count: wordCount, difficulty: settings.difficulty)
+    }
+    
     func restart() {
         gamePhase = .menu
         teams = []
