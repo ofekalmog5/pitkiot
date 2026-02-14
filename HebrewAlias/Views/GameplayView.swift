@@ -111,7 +111,7 @@ struct GameplayView: View {
                 }
             } else {
                 // Game play
-                GameplayCardView()
+                GameplayCardView(showRestartConfirm: $showRestartConfirm)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
@@ -140,6 +140,7 @@ struct GameplayView: View {
 
 struct GameplayCardView: View {
     @EnvironmentObject var viewModel: GameViewModel
+    @Binding var showRestartConfirm: Bool
     
     var body: some View {
         VStack(spacing: 0) {
