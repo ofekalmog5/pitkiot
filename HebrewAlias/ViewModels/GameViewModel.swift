@@ -16,6 +16,7 @@ class GameViewModel: ObservableObject {
     
     private var timer: Timer?
     private var wordDatabase = WordDatabase.shared
+    private var usedWordIds: Set<UUID> = []
     private var roundResults: [RoundResult] = []
     
     // MARK: - Game Setup
@@ -39,6 +40,7 @@ class GameViewModel: ObservableObject {
     private func prepareRound() {
         let wordCount = settings.unlimitedTimeMode ? settings.wordsPerTurnInUnlimitedMode : settings.wordsPerRound
         currentWords = wordDatabase.getRandomWords(count: wordCount, difficulty: settings.difficulty)
+        usedWordIds = Set(currentWords.map { $0.id })
         guessedThisRound = 0
         skippedThisRound = 0
         timeRemaining = settings.timePerTurn
@@ -144,14 +146,19 @@ class GameViewModel: ObservableObject {
     }
     
     func getNextWord() -> Word? {
-        // If all current words are done, generate a new one
-        if !currentWords.contains(where: { !$0.isGuessed && !$0.isSkipped }) {
-            // Generate a new word during the turn
-            if let newWord = wordDatabase.getRandomWords(count: 1, difficulty: settings.difficulty).first {
-                currentWords.append(newWord)
-            }
+        // Return first unguessed/unskipped word
+        if let nextWord = currentWords.first(where: { !$0.isGuessed && !$0.isSkipped }) {
+            return nextWord
         }
-        return currentWords.first { !$0.isGuessed && !$0.isSkipped }
+        
+        // If all current words are done, generate a new one (but avoid duplicates)
+        let usedIds = Set(currentWords.map { $0.id })
+        if let newWord = wordDatabase.getUnusedRandomWord(difficulty: settings.difficulty, excludeIds: usedIds) {
+            currentWords.append(newWord)
+            return newWord
+        }
+        
+        return nil
     }
     
     func restartTurn() {
@@ -165,6 +172,7 @@ class GameViewModel: ObservableObject {
         // Reload words for this turn
         let wordCount = settings.unlimitedTimeMode ? settings.wordsPerTurnInUnlimitedMode : settings.wordsPerRound
         currentWords = wordDatabase.getRandomWords(count: wordCount, difficulty: settings.difficulty)
+        usedWordIds = Set(currentWords.map { $0.id })
     }
     
     func restart() {
@@ -179,5 +187,6 @@ class GameViewModel: ObservableObject {
         skippedThisRound = 0
         gameResults = nil
         roundResults = []
+        usedWordIds = []
     }
 }

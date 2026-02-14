@@ -244,6 +244,18 @@ class WordDatabase {
         }
     }
     
+    func getUnusedRandomWord(difficulty: DifficultyLevel, excludeIds: Set<UUID>) -> Word? {
+        var candidates: [Word]
+        
+        if difficulty == .mixed {
+            candidates = allWords.filter { !excludeIds.contains($0.id) }
+        } else {
+            candidates = allWords.filter { $0.difficulty == difficulty && !excludeIds.contains($0.id) }
+        }
+        
+        return candidates.shuffled().first
+    }
+    
     func getWordsByCategory(_ category: String, count: Int, difficulty: DifficultyLevel = .medium) -> [Word] {
         let categoryWords = allWords.filter { $0.category == category && $0.difficulty == difficulty }
         return Array(categoryWords.shuffled().prefix(count))
