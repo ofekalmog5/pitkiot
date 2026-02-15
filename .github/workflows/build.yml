@@ -34,8 +34,15 @@ jobs:
         echo "Starting device archive build for Release configuration..."
         
         # Clean before building
-        echo "Cleaning old build artifacts..."
+        echo "Cleaning old build artifacts and Xcode cache..."
         rm -rf build/
+        
+        # Clean Xcode derived data to ensure fresh icon assets
+        echo "Cleaning Xcode project..."
+        xcodebuild clean \
+          -project HebrewAlias.xcodeproj \
+          -scheme HebrewAlias \
+          -configuration Release
         
         # Build first (not archive) to ensure Swift compilation
         echo "Building for device..."
@@ -165,6 +172,14 @@ jobs:
         # Verify the app was copied
         echo "=== Checking app contents ==="
         ls -la build/Payload/HebrewAlias.app/
+        
+        # Check if AppIcon files are included
+        echo "=== Verifying AppIcon assets ==="
+        if [ -d "build/Payload/HebrewAlias.app/Assets.car" ] || [ -f "build/Payload/HebrewAlias.app/Assets.car" ]; then
+          echo "✅ Assets.car found in app bundle"
+        else
+          echo "⚠️ Assets.car not found - checking for icon files"
+        fi
         
         if [ ! -f "build/Payload/HebrewAlias.app/HebrewAlias" ]; then
           echo ""
