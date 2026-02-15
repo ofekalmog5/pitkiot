@@ -51,7 +51,7 @@ struct ContentView: View {
                     MenuView()
                 case .teamSetup:
                     TeamSetupView()
-                case .gamePlay:
+                case .gamePlay, .timeUpChallenge:
                     GameplayView()
                 case .roundResults:
                     RoundResultsView()

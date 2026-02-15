@@ -96,6 +96,8 @@ struct CustomSettingsView: View {
     @Binding var settings: GameSettings
     @Binding var showCustomSettings: Bool
     @State private var unlimitedTimeMode: Bool = false
+    @State private var scoreBasedTurnsEnabled: Bool = false
+    @State private var pointsNeededForTurn: Int = 8
     
     var body: some View {
         VStack(spacing: 20) {
@@ -195,6 +197,50 @@ struct CustomSettingsView: View {
                         .tint(.blue)
                     }
                     .padding(.horizontal, 20)
+                    
+                    // Score-Based Turns (only when unlimited mode is on)
+                    if unlimitedTimeMode {
+                        Divider()
+                            .padding(.horizontal, 20)
+                        
+                        VStack(alignment: .leading, spacing: 10) {
+                            Toggle(isOn: $scoreBasedTurnsEnabled) {
+                                VStack(alignment: .leading, spacing: 3) {
+                                    Text("סיום תור לפי ניקוד")
+                                        .font(.headline)
+                                        .fontWeight(.semibold)
+                                    Text(scoreBasedTurnsEnabled ? "תור ינתגמר כאשר מגיעים לניקוד" : "תור ינתגמר אחרי מספר מילים")
+                                        .font(.caption)
+                                        .opacity(0.7)
+                                }
+                            }
+                            .tint(.blue)
+                            
+                            if scoreBasedTurnsEnabled {
+                                VStack(alignment: .leading, spacing: 10) {
+                                    Text("ניקוד לסיום תור: \(pointsNeededForTurn)")
+                                        .font(.headline)
+                                        .fontWeight(.semibold)
+                                    
+                                    Slider(value: Binding(
+                                        get: { Double(pointsNeededForTurn) },
+                                        set: { pointsNeededForTurn = Int($0) }
+                                    ), in: 2...20, step: 1)
+                                        .tint(.blue)
+                                    
+                                    HStack {
+                                        Text("2").font(.caption)
+                                        Spacer()
+                                        Text("20").font(.caption)
+                                    }
+                                    .font(.caption)
+                                }
+                                .padding(.top, 10)
+                                .padding(.horizontal, 15)
+                            }
+                        }
+                        .padding(.horizontal, 20)
+                    }
                 }
                 .padding(.vertical, 20)
             }
@@ -206,6 +252,8 @@ struct CustomSettingsView: View {
                 settings.numberOfRounds = rounds
                 settings.difficulty = difficulty
                 settings.unlimitedTimeMode = unlimitedTimeMode
+                settings.scoreBasedTurnsEnabled = scoreBasedTurnsEnabled
+                settings.pointsNeededForTurn = pointsNeededForTurn
                 showCustomSettings = false
             }) {
                 Text("החל הגדרות")
@@ -222,6 +270,8 @@ struct CustomSettingsView: View {
         }
         .onAppear {
             unlimitedTimeMode = settings.unlimitedTimeMode
+            scoreBasedTurnsEnabled = settings.scoreBasedTurnsEnabled
+            pointsNeededForTurn = settings.pointsNeededForTurn
         }
     }
 }

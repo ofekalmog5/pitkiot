@@ -17,6 +17,7 @@ class GameViewModel: ObservableObject {
     private var timer: Timer?
     private var wordDatabase = WordDatabase.shared
     private var usedWordIds: Set<UUID> = []
+    private var roundStartingScores: [Int] = []  // Track score at start of turn for score-based mode
     private var roundResults: [RoundResult] = []
     
     // MARK: - Game Setup
@@ -68,7 +69,9 @@ class GameViewModel: ObservableObject {
         if timeRemaining > 0 {
             timeRemaining -= 1
         } else {
-            endTurn()
+            isTimerRunning = false
+            timer?.invalidate()
+            gamePhase = .timeUpChallenge  // Show challenge prompt instead of auto-ending
         }
     }
     
@@ -77,6 +80,16 @@ class GameViewModel: ObservableObject {
             currentWords[index].isGuessed = true
             guessedThisRound += 1
             teams[currentTeamIndex].score += 1
+            
+            // Check if score-based turn should end automatically
+            if settings.scoreBasedTurnsEnabled && settings.unlimitedTimeMode {
+                if guessedThisRound > 0 && guessedThisRound % settings.pointsNeededForTurn == 0 {
+                    // Auto-end turn when score reaches target
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+                        self?.endTurn()
+                    }
+                }
+            }
         }
     }
     
@@ -181,7 +194,15 @@ class GameViewModel: ObservableObject {
         usedWordIds = Set(currentWords.map { $0.id })
     }
     
-    func restart() {
+    func challengeAwardPoints(toOtherTeam: Bool) {
+        if toOtherTeam {
+            // Award the points that were just guessed to the other team instead
+            let otherTeamIndex = (currentTeamIndex + 1) % settings.numberOfTeams
+            teams[otherTeamIndex].score += guessedThisRound
+            teams[currentTeamIndex].score -= guessedThisRound
+        }
+        endTurn()
+    }
         gamePhase = .menu
         teams = []
         currentRound = 1

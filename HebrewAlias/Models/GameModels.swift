@@ -30,6 +30,8 @@ struct GameSettings {
     var difficulty: DifficultyLevel = .medium
     var unlimitedTimeMode: Bool = false
     var wordsPerTurnInUnlimitedMode: Int = 5
+    var scoreBasedTurnsEnabled: Bool = false  // When unlimited, use scores instead of words
+    var pointsNeededForTurn: Int = 8  // Turn ends when score is divisible by this
     
     static let presets = [
         GameSettings(numberOfRounds: 1, timePerTurn: 60, numberOfTeams: 2, wordsPerRound: 5, difficulty: .easy),
@@ -118,6 +120,7 @@ enum GamePhase {
     case menu
     case teamSetup
     case gamePlay
+    case timeUpChallenge  // Time expired, waiting for team to confirm who gets the points
     case roundResults
     case gameResults
 }

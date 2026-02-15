@@ -135,7 +135,18 @@ struct GameplayView: View {
         } message: {
             Text("זה יחזור את כל המילים בתור")
         }
-    }
+        .alert("הזמן נגמר!", isPresented: .constant(viewModel.gamePhase == .timeUpChallenge)) {
+            Button("לטיים \(viewModel.getCurrentTeam().name)", role: .none) {
+                viewModel.challengeAwardPoints(toOtherTeam: false)
+            }
+            Button("לקבוצה השנייה - ביקורת", role: .destructive) {
+                viewModel.challengeAwardPoints(toOtherTeam: true)
+            }
+        } message: {
+            let otherTeamIndex = (viewModel.currentTeamIndex + 1) % viewModel.teams.count
+            let otherTeamName = viewModel.teams.indices.contains(otherTeamIndex) ? viewModel.teams[otherTeamIndex].name : ""
+            return Text("ניחשו \(viewModel.guessedThisRound) מילים. האם לתת לקבוצה \(viewModel.getCurrentTeam().name) או להעביר לקבוצה \(otherTeamName) אם יש ביקורת?")
+        }
 }
 
 struct GameplayCardView: View {
