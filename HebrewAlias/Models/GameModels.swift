@@ -34,7 +34,7 @@ struct GameSettings {
     static let presets = [
         GameSettings(numberOfRounds: 1, timePerTurn: 60, numberOfTeams: 2, wordsPerRound: 5, difficulty: .easy),
         GameSettings(numberOfRounds: 3, timePerTurn: 60, numberOfTeams: 2, wordsPerRound: 10, difficulty: .medium),
-        GameSettings(numberOfRounds: 3, timePerTurn: 90, numberOfTeams: 3, wordsPerRound: 10, difficulty: .medium),
+        GameSettings(numberOfRounds: 3, timePerTurn: 60, numberOfTeams: 3, wordsPerRound: 10, difficulty: .medium),
         GameSettings(numberOfRounds: 5, timePerTurn: 60, numberOfTeams: 4, wordsPerRound: 15, difficulty: .hard)
     ]
 }

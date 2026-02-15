@@ -151,9 +151,15 @@ class GameViewModel: ObservableObject {
             return nextWord
         }
         
-        // If all current words are done, generate a new one (but avoid duplicates)
+        // If all current words are done, generate a new one (but avoid duplicates when possible)
         let usedIds = Set(currentWords.map { $0.id })
         if let newWord = wordDatabase.getUnusedRandomWord(difficulty: settings.difficulty, excludeIds: usedIds) {
+            currentWords.append(newWord)
+            return newWord
+        }
+        
+        // If no unused words available, allow reusing any word (fallback for when word pool is exhausted)
+        if let newWord = wordDatabase.getRandomWords(count: 1, difficulty: settings.difficulty).first {
             currentWords.append(newWord)
             return newWord
         }
