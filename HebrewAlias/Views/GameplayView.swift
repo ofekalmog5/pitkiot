@@ -147,6 +147,7 @@ struct GameplayView: View {
             let otherTeamName = viewModel.teams.indices.contains(otherTeamIndex) ? viewModel.teams[otherTeamIndex].name : ""
             Text("ניחשו \(viewModel.guessedThisRound) מילים. האם לתת לקבוצה \(viewModel.getCurrentTeam().name) או להעביר לקבוצה \(otherTeamName) אם יש ביקורת?")
         }
+    }
 }
 
 struct GameplayCardView: View {
