@@ -7,40 +7,97 @@ import SwiftUI
 struct AppIconGenerator: View {
     var body: some View {
         ZStack {
-            // Background - warm paper color
+            // Background - warm yellow/cream
             LinearGradient(
-                colors: [Color(red: 1.0, green: 0.95, blue: 0.85), 
-                        Color(red: 0.95, green: 0.88, blue: 0.75)],
+                colors: [Color(red: 1.0, green: 0.95, blue: 0.7), 
+                        Color(red: 1.0, green: 0.92, blue: 0.6)],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
             
-            // Multiple paper notes stacked
-            VStack(spacing: -20) {
-                // Top note (slightly rotated)
-                NoteCard(
-                    text: "פ",
-                    rotation: -8,
-                    color: Color(red: 1.0, green: 0.95, blue: 0.6)
-                )
-                .offset(x: -15, y: 10)
+            VStack(spacing: 0) {
+                // Top section - notepad spiral
+                HStack(spacing: 0) {
+                    // Spiral binding (3 circles)
+                    VStack(spacing: 25) {
+                        Circle()
+                            .fill(Color(red: 0.3, green: 0.3, blue: 0.4))
+                            .frame(width: 20, height: 20)
+                        Circle()
+                            .fill(Color(red: 0.3, green: 0.3, blue: 0.4))
+                            .frame(width: 20, height: 20)
+                        Circle()
+                            .fill(Color(red: 0.3, green: 0.3, blue: 0.4))
+                            .frame(width: 20, height: 20)
+                    }
+                    .padding(.leading, 40)
+                    .padding(.top, 50)
+                    
+                    Spacer()
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .frame(height: 200)
                 
-                // Middle note
-                NoteCard(
-                    text: "פיתקיות",
-                    rotation: 3,
-                    color: Color(red: 0.6, green: 0.85, blue: 1.0),
-                    fontSize: 32
-                )
-                .offset(x: 10, y: 0)
-                
-                // Bottom note (slightly rotated)
-                NoteCard(
-                    text: "🎯",
-                    rotation: -5,
-                    color: Color(red: 1.0, green: 0.8, blue: 0.85)
-                )
-                .offset(x: -5, y: -10)
+                // Main notepad section
+                ZStack {
+                    // White paper background
+                    RoundedRectangle(cornerRadius: 24)
+                        .fill(Color.white)
+                    
+                    VStack(spacing: 0) {
+                        // Ruled lines for writing
+                        VStack(spacing: 35) {
+                            ForEach(0..<5) { _ in
+                                HStack {
+                                    Rectangle()
+                                        .fill(Color(red: 0.8, green: 0.9, blue: 1.0))
+                                        .frame(height: 2)
+                                }
+                            }
+                        }
+                        .padding(.horizontal, 50)
+                        .padding(.vertical, 40)
+                        
+                        Spacer()
+                    }
+                    
+                    // Pen/pencil icon on the right
+                    VStack(alignment: .trailing) {
+                        HStack(spacing: 0) {
+                            Spacer()
+                            
+                            // Pencil design
+                            ZStack {
+                                // Pencil wood (brown/tan)
+                                RoundedRectangle(cornerRadius: 6)
+                                    .fill(Color(red: 0.85, green: 0.75, blue: 0.5))
+                                    .frame(width: 16, height: 100)
+                                
+                                // Pencil lead (dark)
+                                Rectangle()
+                                    .fill(Color(red: 0.3, green: 0.3, blue: 0.3))
+                                    .frame(width: 4, height: 100)
+                                
+                                // Pencil tip (sharp triangle)
+                                ZStack {
+                                    Polygon(sides: 3)
+                                        .fill(Color(red: 0.2, green: 0.2, blue: 0.2))
+                                        .frame(width: 16, height: 12)
+                                }
+                                .offset(y: 50)
+                            }
+                            .rotationEffect(.degrees(-45))
+                            .offset(x: 20, y: -30)
+                        }
+                        
+                        Spacer()
+                    }
+                    .padding(.trailing, 40)
+                    .padding(.top, 40)
+                }
+                .frame(maxHeight: .infinity)
+                .padding(.horizontal, 40)
+                .padding(.vertical, 50)
             }
         }
         .frame(width: 1024, height: 1024)
@@ -48,43 +105,27 @@ struct AppIconGenerator: View {
     }
 }
 
-struct NoteCard: View {
-    let text: String
-    let rotation: Double
-    let color: Color
-    var fontSize: CGFloat = 80
+// Simple polygon shape for pencil tip
+struct Polygon: Shape {
+    let sides: Int
     
-    var body: some View {
-        ZStack {
-            // Paper shadow
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color.black.opacity(0.2))
-                .frame(width: 200, height: 200)
-                .offset(y: 8)
+    func path(in rect: CGRect) -> Path {
+        let center = CGPoint(x: rect.midX, y: rect.midY)
+        var path = Path()
+        
+        for i in 0..<sides {
+            let angle = Double(i) * 2 * .pi / Double(sides) - .pi / 2
+            let x = center.x + rect.width / 2 * cos(angle)
+            let y = center.y + rect.height / 2 * sin(angle)
             
-            // Main paper note
-            RoundedRectangle(cornerRadius: 12)
-                .fill(color)
-                .frame(width: 200, height: 200)
-                .overlay(
-                    // Paper texture lines
-                    VStack(spacing: 25) {
-                        ForEach(0..<3) { _ in
-                            Rectangle()
-                                .fill(Color.black.opacity(0.05))
-                                .frame(height: 2)
-                        }
-                    }
-                    .padding(.horizontal, 20)
-                )
-                .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
-            
-            // Text on note
-            Text(text)
-                .font(.system(size: fontSize, weight: .bold))
-                .foregroundColor(Color(red: 0.2, green: 0.2, blue: 0.3))
+            if i == 0 {
+                path.move(to: CGPoint(x: x, y: y))
+            } else {
+                path.addLine(to: CGPoint(x: x, y: y))
+            }
         }
-        .rotationEffect(.degrees(rotation))
+        path.closeSubpath()
+        return path
     }
 }
 
