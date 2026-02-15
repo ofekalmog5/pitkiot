@@ -1,103 +1,40 @@
 import SwiftUI
 
-// This view generates the app icon design
+// This view generates the app icon design - "notes" theme
 // To use: Run the app, navigate to this view, take a screenshot, and crop to 1024x1024px
 // Then save as icon-1024.png in Resources/Assets.xcassets/AppIcon.appiconset/
 
 struct AppIconGenerator: View {
     var body: some View {
         ZStack {
-            // Background - warm yellow/cream
-            LinearGradient(
-                colors: [Color(red: 1.0, green: 0.95, blue: 0.7), 
-                        Color(red: 1.0, green: 0.92, blue: 0.6)],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
+            // Background - dark blue
+            Color(red: 0.13, green: 0.25, blue: 0.35)
+                .ignoresSafeArea()
             
             VStack(spacing: 0) {
-                // Top section - notepad spiral
+                Spacer()
+                
+                // Main text and circle
                 HStack(spacing: 0) {
-                    // Spiral binding (3 circles)
-                    VStack(spacing: 25) {
-                        Circle()
-                            .fill(Color(red: 0.3, green: 0.3, blue: 0.4))
-                            .frame(width: 20, height: 20)
-                        Circle()
-                            .fill(Color(red: 0.3, green: 0.3, blue: 0.4))
-                            .frame(width: 20, height: 20)
-                        Circle()
-                            .fill(Color(red: 0.3, green: 0.3, blue: 0.4))
-                            .frame(width: 20, height: 20)
-                    }
-                    .padding(.leading, 40)
-                    .padding(.top, 50)
+                    // White text "notes"
+                    Text("notes")
+                        .font(.system(size: 140, weight: .bold, design: .default))
+                        .tracking(8)
+                        .foregroundColor(.white)
                     
                     Spacer()
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .frame(height: 200)
+                .frame(maxWidth: .infinity, alignment: .center)
                 
-                // Main notepad section
-                ZStack {
-                    // White paper background
-                    RoundedRectangle(cornerRadius: 24)
-                        .fill(Color.white)
-                    
-                    VStack(spacing: 0) {
-                        // Ruled lines for writing
-                        VStack(spacing: 35) {
-                            ForEach(0..<5) { _ in
-                                HStack {
-                                    Rectangle()
-                                        .fill(Color(red: 0.8, green: 0.9, blue: 1.0))
-                                        .frame(height: 2)
-                                }
-                            }
-                        }
-                        .padding(.horizontal, 50)
-                        .padding(.vertical, 40)
-                        
-                        Spacer()
-                    }
-                    
-                    // Pen/pencil icon on the right
-                    VStack(alignment: .trailing) {
-                        HStack(spacing: 0) {
-                            Spacer()
-                            
-                            // Pencil design
-                            ZStack {
-                                // Pencil wood (brown/tan)
-                                RoundedRectangle(cornerRadius: 6)
-                                    .fill(Color(red: 0.85, green: 0.75, blue: 0.5))
-                                    .frame(width: 16, height: 100)
-                                
-                                // Pencil lead (dark)
-                                Rectangle()
-                                    .fill(Color(red: 0.3, green: 0.3, blue: 0.3))
-                                    .frame(width: 4, height: 100)
-                                
-                                // Pencil tip (sharp triangle)
-                                ZStack {
-                                    Polygon(sides: 3)
-                                        .fill(Color(red: 0.2, green: 0.2, blue: 0.2))
-                                        .frame(width: 16, height: 12)
-                                }
-                                .offset(y: 50)
-                            }
-                            .rotationEffect(.degrees(-45))
-                            .offset(x: 20, y: -30)
-                        }
-                        
-                        Spacer()
-                    }
-                    .padding(.trailing, 40)
-                    .padding(.top, 40)
-                }
-                .frame(maxHeight: .infinity)
-                .padding(.horizontal, 40)
-                .padding(.vertical, 50)
+                Spacer()
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            
+            // Teal/Turquoise circle overlay (positioned over the 'o' in notes)
+            Circle()
+                .stroke(Color(red: 0.2, green: 0.8, blue: 0.8), lineWidth: 35)
+                .frame(width: 240, height: 240)
+                .offset(x: -80, y: 0)
             }
         }
         .frame(width: 1024, height: 1024)

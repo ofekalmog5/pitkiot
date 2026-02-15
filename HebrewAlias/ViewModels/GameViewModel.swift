@@ -228,13 +228,18 @@ class GameViewModel: ObservableObject {
     }
     
     func restart() {
+        // Stop any running timer first
+        isTimerRunning = false
+        timer?.invalidate()
+        timer = nil
+        
+        // Reset all game state
         gamePhase = .menu
         teams = []
         currentRound = 1
         currentTeamIndex = 0
         currentWords = []
         timeRemaining = 60
-        isTimerRunning = false
         guessedThisRound = 0
         skippedThisRound = 0
         gameResults = nil
