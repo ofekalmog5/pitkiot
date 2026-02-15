@@ -145,7 +145,7 @@ struct GameplayView: View {
         } message: {
             let otherTeamIndex = (viewModel.currentTeamIndex + 1) % viewModel.teams.count
             let otherTeamName = viewModel.teams.indices.contains(otherTeamIndex) ? viewModel.teams[otherTeamIndex].name : ""
-            return Text("ניחשו \(viewModel.guessedThisRound) מילים. האם לתת לקבוצה \(viewModel.getCurrentTeam().name) או להעביר לקבוצה \(otherTeamName) אם יש ביקורת?")
+            Text("ניחשו \(viewModel.guessedThisRound) מילים. האם לתת לקבוצה \(viewModel.getCurrentTeam().name) או להעביר לקבוצה \(otherTeamName) אם יש ביקורת?")
         }
 }
 

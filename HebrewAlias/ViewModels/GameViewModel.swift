@@ -203,6 +203,8 @@ class GameViewModel: ObservableObject {
         }
         endTurn()
     }
+    
+    func restart() {
         gamePhase = .menu
         teams = []
         currentRound = 1
