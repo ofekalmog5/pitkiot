@@ -120,7 +120,7 @@ struct GameplayView: View {
             Button("סיים תור", role: .none) {
                 viewModel.endTurn()
             }
-            Button("יציאה למשחק", role: .destructive) {
+            Button("חזור לתפריט הבית", role: .destructive) {
                 viewModel.restart()
             }
         } message: {

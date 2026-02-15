@@ -81,6 +81,18 @@ class GameViewModel: ObservableObject {
             guessedThisRound += 1
             teams[currentTeamIndex].score += 1
             
+            let totalProcessedWords = guessedThisRound + skippedThisRound
+            
+            // Check if 5-word limit reached in unlimited mode (without score-based turns)
+            if settings.unlimitedTimeMode && !settings.scoreBasedTurnsEnabled {
+                if totalProcessedWords >= settings.wordsPerTurnInUnlimitedMode {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+                        self?.endTurn()
+                    }
+                    return
+                }
+            }
+            
             // Check if score-based turn should end automatically
             if settings.scoreBasedTurnsEnabled && settings.unlimitedTimeMode {
                 if guessedThisRound > 0 && guessedThisRound % settings.pointsNeededForTurn == 0 {
@@ -97,6 +109,17 @@ class GameViewModel: ObservableObject {
         if let index = currentWords.firstIndex(where: { $0.id == word.id }) {
             currentWords[index].isSkipped = true
             skippedThisRound += 1
+            
+            let totalProcessedWords = guessedThisRound + skippedThisRound
+            
+            // Check if 5-word limit reached in unlimited mode (without score-based turns)
+            if settings.unlimitedTimeMode && !settings.scoreBasedTurnsEnabled {
+                if totalProcessedWords >= settings.wordsPerTurnInUnlimitedMode {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+                        self?.endTurn()
+                    }
+                }
+            }
         }
     }
     
