@@ -35,7 +35,6 @@ struct AppIconGenerator: View {
                 .stroke(Color(red: 0.2, green: 0.8, blue: 0.8), lineWidth: 35)
                 .frame(width: 240, height: 240)
                 .offset(x: -80, y: 0)
-            }
         }
         .frame(width: 1024, height: 1024)
         .clipShape(RoundedRectangle(cornerRadius: 226)) // iOS app icon corner radius
