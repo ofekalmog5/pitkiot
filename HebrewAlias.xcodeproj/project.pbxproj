@@ -19,6 +19,7 @@
 		5710AAAA2B7A8C0000ABC123 /* GameResultsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 570E1A582B7A8C0000ABC123 /* GameResultsView.swift */; };
 		5710AAAB2B7A8C0000ABC123 /* AppIconGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 570E1A5A2B7A8C0000ABC123 /* AppIconGenerator.swift */; };
 		5710AAAC2B7A8C0000ABC123 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 570E1A5B2B7A8C0000ABC123 /* Assets.xcassets */; };
+		57F0AAB02C00000000ABC123 /* words_he.txt in Resources */ = {isa = PBXBuildFile; fileRef = 57F0AAAF2C00000000ABC123 /* words_he.txt */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -36,6 +37,7 @@
 		570E1A592B7A8C0000ABC123 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		570E1A5A2B7A8C0000ABC123 /* AppIconGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIconGenerator.swift; sourceTree = "<group>"; };
 		570E1A5B2B7A8C0000ABC123 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		57F0AAAF2C00000000ABC123 /* words_he.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = words_he.txt; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 		570E1A1F2B7A8C0000ABC123 = {
@@ -71,6 +73,7 @@
 			isa = PBXGroup;
 			children = (
 				570E1A5B2B7A8C0000ABC123 /* Assets.xcassets */,
+				57F0AAAF2C00000000ABC123 /* words_he.txt */,
 				570E1A592B7A8C0000ABC123 /* Info.plist */,
 			);
 			path = Resources;
@@ -200,6 +203,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5710AAAC2B7A8C0000ABC123 /* Assets.xcassets in Resources */,
+				57F0AAB02C00000000ABC123 /* words_he.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
